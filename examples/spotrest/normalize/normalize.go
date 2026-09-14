@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/shifty11/api-go/v2/pkg/spot"
+	"github.com/krakenfx/api-go/v2/pkg/spot"
 )
 
 func main() {

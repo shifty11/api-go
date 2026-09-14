@@ -5,8 +5,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/shifty11/api-go/v2/internal/helper"
-	"github.com/shifty11/api-go/v2/pkg/spot"
+	"github.com/krakenfx/api-go/v2/internal/helper"
+	"github.com/krakenfx/api-go/v2/pkg/spot"
 )
 
 func main() {

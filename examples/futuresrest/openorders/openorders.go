@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/shifty11/api-go/v2/pkg/decimal"
-	"github.com/shifty11/api-go/v2/pkg/derivatives"
+	"github.com/krakenfx/api-go/v2/pkg/decimal"
+	"github.com/krakenfx/api-go/v2/pkg/derivatives"
 )
 
 func main() {

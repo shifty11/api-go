@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
-	"github.com/shifty11/api-go/v2/pkg/callback"
+	"github.com/krakenfx/api-go/v2/pkg/callback"
 )
 
 // ErrAlreadyConnected is returned by [WebSocket.Connect] when a connection is

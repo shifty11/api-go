@@ -7,8 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shifty11/api-go/v2/internal/helper"
-	"github.com/shifty11/api-go/v2/pkg/kraken"
+	"github.com/krakenfx/api-go/v2/internal/helper"
+	"github.com/krakenfx/api-go/v2/pkg/kraken"
 )
 
 // REST wraps [RESTBase] with functions to call common endpoints.
