@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/krakenfx/api-go/v2/internal/helper"
-	"github.com/krakenfx/api-go/v2/pkg/derivatives"
+	"github.com/shifty11/api-go/v2/internal/helper"
+	"github.com/shifty11/api-go/v2/pkg/derivatives"
 )
 
 func main() {

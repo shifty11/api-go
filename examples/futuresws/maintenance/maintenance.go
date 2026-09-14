@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
-	"github.com/krakenfx/api-go/v2/pkg/callback"
-	"github.com/krakenfx/api-go/v2/pkg/derivatives"
-	"github.com/krakenfx/api-go/v2/pkg/kraken"
+	"github.com/shifty11/api-go/v2/pkg/callback"
+	"github.com/shifty11/api-go/v2/pkg/derivatives"
+	"github.com/shifty11/api-go/v2/pkg/kraken"
 )
 
 func main() {
