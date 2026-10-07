@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 
@@ -84,6 +85,34 @@ func NewWebSocket() *WebSocket {
 	return ws
 }
 
+// HandshakeError is returned by Connect when the server answers the
+// WebSocket upgrade with an HTTP status instead of 101.
+type HandshakeError struct {
+	StatusCode int
+	RetryAfter time.Duration // 0 when the header is missing or not parseable
+	Err        error
+}
+
+func (e *HandshakeError) Error() string {
+	return fmt.Sprintf("dial failed: HTTP %d: %s", e.StatusCode, e.Err)
+}
+
+func (e *HandshakeError) Unwrap() error { return e.Err }
+
+// parseRetryAfter reads a Retry-After header, given in seconds or as an HTTP date.
+func parseRetryAfter(v string) time.Duration {
+	if v == "" {
+		return 0
+	}
+	if secs, err := strconv.Atoi(v); err == nil {
+		return max(0, time.Duration(secs)*time.Second)
+	}
+	if t, err := http.ParseTime(v); err == nil {
+		return max(0, time.Until(t))
+	}
+	return 0
+}
+
 // Connect establishes a connection.
 //
 // It is safe for concurrent use and returns [ErrAlreadyConnected] instead of
@@ -112,13 +141,21 @@ func (ws *WebSocket) Connect() error {
 			},
 		}
 	}
-	connection, _, err := dialer.Dial(url, nil)
+	connection, resp, err := dialer.Dial(url, nil)
 
 	ws.mux.Lock()
 	ws.connecting = false
 	if err != nil {
 		ws.mux.Unlock()
-		return fmt.Errorf("dial failed: %s", err)
+		if resp != nil {
+			defer resp.Body.Close()
+			return &HandshakeError{
+				StatusCode: resp.StatusCode,
+				RetryAfter: parseRetryAfter(resp.Header.Get("Retry-After")),
+				Err:        err,
+			}
+		}
+		return fmt.Errorf("dial failed: %w", err)
 	}
 	// A reader may have failed and reconnected while this dial was in flight.
 	if ws.active {

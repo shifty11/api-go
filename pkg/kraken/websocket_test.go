@@ -244,3 +244,42 @@ func TestWriteMessageWithoutAConnection(t *testing.T) {
 		t.Fatal("WriteMessage without a connection succeeded, want an error")
 	}
 }
+
+func TestConnectReturnsHandshakeError(t *testing.T) {
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Retry-After", "30")
+		http.Error(w, "slow down", http.StatusTooManyRequests)
+	}))
+	defer server.Close()
+
+	ws := NewWebSocket()
+	ws.URL = "ws" + strings.TrimPrefix(server.URL, "http")
+	err := ws.Connect()
+
+	var he *HandshakeError
+	if !errors.As(err, &he) {
+		t.Fatalf("want *HandshakeError, got %v", err)
+	}
+	if he.StatusCode != http.StatusTooManyRequests {
+		t.Errorf("status = %d, want 429", he.StatusCode)
+	}
+	if he.RetryAfter != 30*time.Second {
+		t.Errorf("RetryAfter = %v, want 30s", he.RetryAfter)
+	}
+	if !strings.Contains(err.Error(), "HTTP 429") {
+		t.Errorf("error text %q lacks the status", err)
+	}
+}
+
+func TestParseRetryAfter(t *testing.T) {
+	if got := parseRetryAfter(""); got != 0 {
+		t.Errorf("empty = %v", got)
+	}
+	if got := parseRetryAfter("junk"); got != 0 {
+		t.Errorf("junk = %v", got)
+	}
+	date := time.Now().Add(time.Minute).UTC().Format(http.TimeFormat)
+	if got := parseRetryAfter(date); got < 50*time.Second || got > time.Minute {
+		t.Errorf("date = %v", got)
+	}
+}
